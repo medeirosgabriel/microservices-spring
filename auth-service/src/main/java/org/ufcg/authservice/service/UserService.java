@@ -9,17 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.ufcg.authservice.model.User;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @Service
 public class UserService implements UserDetailsService {
 
     @Autowired
     private WebClient.Builder webClientBuilder;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
 
     public User findByEmail(String email) {
        User user = webClientBuilder.build().get()
@@ -39,7 +33,7 @@ public class UserService implements UserDetailsService {
         try {
             User user = this.findByEmail(username);
             System.out.println(user.getUsername() + " - " + user.getPassword());
-            String password =  passwordEncoder.encode(user.getPassword());
+            String password =  (new BCryptPasswordEncoder()).encode(user.getPassword());
             return new org.springframework.security.core.userdetails.User(user.getUsername(), password, user.getAuthorities());
         } catch (UsernameNotFoundException e) {
             throw new UsernameNotFoundException("Email not Found");
